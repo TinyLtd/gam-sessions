@@ -13,8 +13,7 @@ Workspace tenant works the same way.
 
 ## Requirements
 
-- macOS 13 or later
-- Xcode command line tools (`xcode-select --install`), for `swiftc`
+- macOS 13 or later, Intel or Apple Silicon
 - GAM already installed — [GAM7](https://github.com/GAM-team/GAM) or
   [GAMADV-XTD3](https://github.com/taers232c/GAMADV-XTD3). The app looks in
   `~/bin/gamadv-xtd3`, `~/bin/gam7`, `~/bin/gam`, `/usr/local/bin` and
@@ -22,14 +21,30 @@ Workspace tenant works the same way.
 
 ## Install
 
+### Download (no Xcode needed)
+
+Grab the zip from
+[Releases](https://github.com/TinyLtd/gam-sessions/releases/latest), unzip it,
+then from the unzipped folder:
+
+```bash
+./install.sh
+```
+
+Universal build, so it runs on Intel and Apple Silicon.
+
+### Build from source
+
+Needs the Xcode command line tools (`xcode-select --install`):
+
 ```bash
 git clone https://github.com/TinyLtd/gam-sessions.git
 cd gam-sessions
 ./install.sh
 ```
 
-Builds the app, copies it to `/Applications`, and registers a LaunchAgent so it
-starts at login. A **G** appears in your menu bar.
+Either way, `install.sh` copies the app to `/Applications` and registers a
+LaunchAgent so it starts at login. A **G** appears in your menu bar.
 
 ```bash
 ./install.sh uninstall
@@ -37,6 +52,15 @@ starts at login. A **G** appears in your menu bar.
 
 Removes the app and the login item. Your configs in `~/.gam-companies` are left
 alone.
+
+The app is ad-hoc signed, not notarized by Apple, so a downloaded copy is
+quarantined. `install.sh` clears that flag. If you drag the app to
+`/Applications` by hand instead, clear it yourself or macOS will call it
+damaged:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/GAMSessions.app
+```
 
 ## Use
 
@@ -68,9 +92,11 @@ ln -s ~/gam-acme ~/.gam-companies/acme
 ## Development
 
 ```bash
-./build.sh                                                  # build only
+./build.sh                                                  # universal build
+NATIVE_ONLY=1 ./build.sh                                    # quicker, this Mac only
 ./GAMSessions.app/Contents/MacOS/GAMSessions --selftest     # name-guard checks
 ./install-startup.sh                                        # login item for the local build
+./release.sh v1.0.1                                         # publish a release zip
 ```
 
 Everything is in [main.swift](main.swift) — a couple of hundred lines, AppKit

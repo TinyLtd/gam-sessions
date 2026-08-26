@@ -20,17 +20,28 @@ if [[ "${1:-install}" == "uninstall" ]]; then
   exit 0
 fi
 
-command -v swiftc >/dev/null || {
-  echo "swiftc not found. Install the Xcode command line tools:" >&2
+# Three ways to get an app: build it, use the prebuilt one shipped in the
+# release zip, or tell the user where to get one.
+if command -v swiftc >/dev/null; then
+  ./build.sh
+elif [[ -d GAMSessions.app ]]; then
+  echo "No swiftc — using the prebuilt GAMSessions.app next to this script."
+else
+  echo "Nothing to install." >&2
+  echo "Either install the Xcode command line tools and build from source:" >&2
   echo "  xcode-select --install" >&2
+  echo "or download the prebuilt zip from:" >&2
+  echo "  https://github.com/TinyLtd/gam-sessions/releases/latest" >&2
   exit 1
-}
-
-./build.sh
+fi
 
 mkdir -p "$DEST"
 rm -rf "$APP"
 cp -R GAMSessions.app "$APP"
+# A zip fetched by a browser carries a quarantine flag, and this app is only
+# ad-hoc signed, so Gatekeeper refuses it outright ("damaged") rather than
+# offering an override. Clearing it is what the user would otherwise do by hand.
+xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
 GAM_APP="$APP" ./install-startup.sh
 
 echo

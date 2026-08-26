@@ -1,13 +1,34 @@
 #!/bin/bash
 # Compile main.swift into GAMSessions.app (menu-bar agent, no Dock icon).
+# Universal by default so a release runs on Intel and Apple Silicon alike;
+# set NATIVE_ONLY=1 for a quicker single-arch build while developing.
 set -euo pipefail
 cd "$(dirname "$0")"
 
 APP="GAMSessions.app"
+BIN="$APP/Contents/MacOS/GAMSessions"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
-swiftc -O main.swift -o "$APP/Contents/MacOS/GAMSessions"
+if [[ -n "${NATIVE_ONLY:-}" ]]; then
+  swiftc -O main.swift -o "$BIN"
+else
+  # Both slices, then lipo. If a slice will not build (SDK missing an arch),
+  # fall back to native rather than failing the whole build.
+  ok=1
+  for t in arm64-apple-macos13 x86_64-apple-macos13; do
+    swiftc -O -target "$t" main.swift -o "/tmp/GAMSessions-$t" 2>/dev/null || ok=0
+  done
+  if [[ $ok == 1 ]]; then
+    lipo -create -output "$BIN" /tmp/GAMSessions-arm64-apple-macos13 \
+                                /tmp/GAMSessions-x86_64-apple-macos13
+    rm -f /tmp/GAMSessions-arm64-apple-macos13 /tmp/GAMSessions-x86_64-apple-macos13
+  else
+    echo "Note: could not build both architectures — this build is $(uname -m) only." >&2
+    swiftc -O main.swift -o "$BIN"
+  fi
+fi
+
 cp icon.png "$APP/Contents/Resources/icon.png"
 cp AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
@@ -34,4 +55,4 @@ PLIST
 
 codesign --force --sign - "$APP"
 
-echo "Built $APP — open it with: open $APP"
+echo "Built $APP ($(lipo -archs "$BIN"))"
