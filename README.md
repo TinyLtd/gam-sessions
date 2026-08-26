@@ -8,8 +8,9 @@ at that company's own config — its own OAuth token, its own service account, i
 own cache. No re-authorizing when you switch, and no way to accidentally run a
 command against the wrong tenant.
 
-Built for managing a portfolio of companies. Anything with more than one
-Workspace tenant works the same way.
+Useful anywhere you administer more than one Workspace tenant — a managed
+service provider, a reseller, a holding company, or just a couple of domains
+of your own.
 
 ## Requirements
 
@@ -24,7 +25,7 @@ Workspace tenant works the same way.
 ### Download (no Xcode needed)
 
 Grab the zip from
-[Releases](https://github.com/TinyLtd/gam-sessions/releases/latest), unzip it,
+[Releases](https://github.com/OWNER/gam-sessions/releases/latest), unzip it,
 then from the unzipped folder:
 
 ```bash
@@ -38,7 +39,7 @@ Universal build, so it runs on Intel and Apple Silicon.
 Needs the Xcode command line tools (`xcode-select --install`):
 
 ```bash
-git clone https://github.com/TinyLtd/gam-sessions.git
+git clone https://github.com/OWNER/gam-sessions.git
 cd gam-sessions
 ./install.sh
 ```
@@ -80,6 +81,9 @@ config? Symlink it instead of setting it up again:
 ```bash
 ln -s ~/gam-acme ~/.gam-companies/acme
 ```
+
+> Replace `OWNER` in the URLs above with wherever you host this. The scripts
+> read the repo from your git remote, so only this README needs editing.
 
 ## Docs
 

@@ -1,7 +1,7 @@
 import Cocoa
 
-// Menu-bar agent: pick a portfolio company -> Terminal shell wired to its GAM
-// config (own GAMCFGDIR = own oauth tokens / service account).
+// Menu-bar agent: pick a company -> Terminal shell wired to its GAM config
+// (own GAMCFGDIR = own oauth tokens / service account).
 // Add/delete companies straight from the menu.
 
 let fm = FileManager.default

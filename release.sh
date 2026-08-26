@@ -7,7 +7,8 @@ cd "$(dirname "$0")"
 
 TAG="${1:-}"
 [[ -n "$TAG" ]] || { echo "Usage: ./release.sh v1.0.0" >&2; exit 1; }
-REPO="TinyLtd/gam-sessions"
+# Derived, not hardcoded, so a fork releases to itself.
+REPO="${REPO:-$(gh repo view --json nameWithOwner --jq .nameWithOwner)}"
 ZIP="GAMSessions-$TAG.zip"
 
 ./build.sh
@@ -51,8 +52,10 @@ the app to /Applications by hand instead, clear it yourself:
 
     xattr -dr com.apple.quarantine /Applications/GAMSessions.app
 
-Docs: https://github.com/TinyLtd/gam-sessions
+Docs: https://github.com/__REPO__
 TXT
+
+sed -i '' "s|__REPO__|$REPO|" "$STAGE/GAMSessions/README.txt"
 
 (cd "$STAGE" && zip -qr "$ZIP" GAMSessions)
 

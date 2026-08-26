@@ -1,0 +1,26 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (universal)
+        run: ./build.sh
+      - name: Verify both architectures
+        run: |
+          archs=$(lipo -archs GAMSessions.app/Contents/MacOS/GAMSessions)
+          echo "$archs"
+          [[ "$archs" == *arm64* && "$archs" == *x86_64* ]] || {
+            echo "::error::not universal: $archs"; exit 1; }
+      - name: Selftest
+        run: ./GAMSessions.app/Contents/MacOS/GAMSessions --selftest
+      - name: Shellcheck the scripts
+        run: |
+          brew install shellcheck
+          shellcheck build.sh install.sh install-startup.sh release.sh

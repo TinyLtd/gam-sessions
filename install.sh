@@ -30,8 +30,9 @@ else
   echo "Nothing to install." >&2
   echo "Either install the Xcode command line tools and build from source:" >&2
   echo "  xcode-select --install" >&2
-  echo "or download the prebuilt zip from:" >&2
-  echo "  https://github.com/TinyLtd/gam-sessions/releases/latest" >&2
+  echo "or download the prebuilt zip from this project's releases page:" >&2
+  origin=$(git config --get remote.origin.url 2>/dev/null || true)
+  [[ -n "$origin" ]] && echo "  ${origin%.git}/releases/latest" >&2
   exit 1
 fi
 
