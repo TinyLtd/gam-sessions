@@ -117,3 +117,7 @@ swiftc -O mkicon.swift -o /tmp/mkicon
 ```
 
 Then `sips` and `iconutil` to build `AppIcon.icns` from the 1024px master.
+
+## License
+
+[MIT](LICENSE).
